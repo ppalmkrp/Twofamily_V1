@@ -10,7 +10,8 @@ return new class extends Migration {
         Schema::create('drivers', function (Blueprint $table) {
             $table->increments('id_driver');
 
-            $table->string('name_driver', 255);
+            $table->string('fname_driver', 255);
+            $table->string('lname_driver', 255);
 
             // ที่อยู่
             $table->string('address_detail', 255)->nullable(); // บ้านเลขที่ / หมู่

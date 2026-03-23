@@ -59,7 +59,13 @@ $provinces = [
             <div class="card-body p-4 p-lg-5">
                 <form method="POST" action="{{ route('trucks.store') }}" autocomplete="off">
                     @csrf
-                    @include('trucks._form', ['truck' => $truck, 'mode' => 'create'])
+
+                    @include('trucks._form', [
+                        'truck' => $truck,
+                        'mode' => 'create',
+                        'brands' => $brands,
+                        'provinces' => $provinces
+                    ])
 
                     <div class="mt-4 d-flex gap-2">
                         <button class="btn btn-dark btn-lg px-4" type="submit">บันทึก</button>

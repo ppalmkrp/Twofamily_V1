@@ -195,6 +195,31 @@
                         </li>
 
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('truck_brands.*') || request()->routeIs('truck_models.*') ? 'active' : '' }}"
+                                data-bs-toggle="collapse" href="#truckMenu" role="button"
+                                aria-expanded="{{ request()->routeIs('truck_brands.*') || request()->routeIs('truck_models.*') ? 'true' : 'false' }}"
+                                aria-controls="truckMenu">
+                                <span>จัดการข้อมูลรถบรรทุก</span>
+                                <i class="bi bi-caret-down-fill arrow"></i>
+                            </a>
+
+                            <div class="collapse submenu {{ request()->routeIs('truck_brands.*') || request()->routeIs('truck_models.*') ? 'show' : '' }}"
+                                id="truckMenu" data-bs-parent="#sidebarMenu">
+
+                                <a href="{{ route('truck_brands.index') }}"
+                                    class="sub-link {{ request()->routeIs('truck_brands.*') ? 'active' : '' }}">
+                                    ยี่ห้อรถบรรทุก
+                                </a>
+
+                                <a href="{{ route('truck_models.index') }}"
+                                    class="sub-link {{ request()->routeIs('truck_models.*') ? 'active' : '' }}">
+                                    รุ่นรถบรรทุก
+                                </a>
+
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
                             <a href="{{ route('trucks.index') }}"
                                 class="nav-link {{ request()->routeIs('trucks.*') ? 'active' : '' }}">
                                 <span>รถบรรทุก</span>
@@ -270,7 +295,12 @@
                             <ul class="dropdown-menu dropdown-menu-dark shadow user-menu">
                                 <li>
                                     <a class="dropdown-item" href="{{ route('profile.show') }}">
-                                        Profile
+                                        จัดการบัญชีผู้ใช้
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('settings.index') }}">
+                                        ตั้งค่า
                                     </a>
                                 </li>
 

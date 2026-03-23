@@ -58,7 +58,13 @@ $provinces = [
             <div class="card-body p-4 p-lg-5">
                 <form method="POST" action="{{ route('trucks.update', $truck->id_truck) }}" autocomplete="off">
                     @csrf @method('PUT')
-                    @include('trucks._form', ['truck' => $truck, 'mode' => 'edit'])
+
+                    @include('trucks._form', [
+                        'truck' => $truck,
+                        'mode' => 'edit',
+                        'brands' => $brands,
+                        'provinces' => $provinces
+                    ])
 
                     <div class="mt-4 d-flex gap-2">
                         <button class="btn btn-dark btn-lg px-4" type="submit">บันทึกการแก้ไข</button>

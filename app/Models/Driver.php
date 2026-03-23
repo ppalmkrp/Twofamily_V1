@@ -12,7 +12,8 @@ class Driver extends Model
     protected $primaryKey = 'id_driver';
 
     protected $fillable = [
-        'name_driver',
+        'fname_driver',
+        'lname_driver',
         'address_detail',
         'subdistrict',
         'district',

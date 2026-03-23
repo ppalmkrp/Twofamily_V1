@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
 use App\Models\FuelRecord;
 use App\Models\Truck;
 use Illuminate\Http\Request;
@@ -24,11 +25,30 @@ class FuelRecordController extends Controller
 
         return view('fuel_records.index', compact('records', 'trucks', 'q', 'trucks_id'));
     }
-
     public function create()
     {
         $trucks = Truck::where('status_truck', 'active')->get();
-        return view('fuel_records.create', compact('trucks'));
+        $dieselPrice = '';
+
+        try {
+            $response = Http::get('https://oil-price.bangchak.co.th/apioilprice2/th');
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (!empty($data) && isset($data[0]['OilList'])) {
+                    $oilList = json_decode($data[0]['OilList'], true);
+
+                    $diesel = collect($oilList)->firstWhere('OilName', 'ไฮดีเซล S');
+                    if ($diesel) {
+                        //  แก้ไขตรงนี้ให้ดึง PriceToday ก่อน ถ้าไม่มีค่อยเอา PriceTomorrow
+                        $dieselPrice = $diesel['PriceToday'] ?? $diesel['PriceTomorrow'];
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+        }
+
+        return view('fuel_records.create', compact('trucks', 'dieselPrice'));
     }
 
     public function store(Request $request)

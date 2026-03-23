@@ -40,10 +40,7 @@
                     @forelse($drivers as $d)
                         <tr onclick="window.location='{{ route('drivers.show', $d) }}'" style="cursor:pointer">
 
-                            <td class="fw-semibold">
-                                {{ $d->name_driver }}
-                            </td>
-
+                            <td>{{ $d->fname_driver }} {{ $d->lname_driver }}</td>
                             <td class="small text-muted">
                                 {{ $d->address_detail }}
                                 {{ $d->subdistrict }}

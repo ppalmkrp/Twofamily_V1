@@ -3,34 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
-    use SoftDeletes;
+    protected $primaryKey = 'id_invoice';
 
-    protected $primaryKey = 'id_iv';
-
-    // ✅ เพิ่มส่วนนี้
     protected $fillable = [
-        'date_iv',
-        'end_iv',
-        'status',
-        'Customers_id_customer',
+        'id_quotation',
+        'id_customer',
+        'total',
+        'status'
     ];
 
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class, 'Customers_id_customer', 'id_customer');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'Users_id_user');
-    }
-
+    // 🔗 ความสัมพันธ์กับรายละเอียดสินค้า
     public function details()
     {
-        return $this->hasMany(InvoiceDetail::class, 'Invoice_id_iv', 'id_iv');
+        return $this->hasMany(InvoiceDetail::class, 'id_invoice');
+    }
+
+    // 🔗 ลูกค้า
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'id_customer');
+    }
+
+    // 🔗 ใบเสนอราคา
+    public function quotation()
+    {
+        return $this->belongsTo(Quotation::class, 'id_quotation', 'id_quot');
     }
 }

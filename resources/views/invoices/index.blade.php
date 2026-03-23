@@ -9,17 +9,11 @@
 @section('content')
 <div class="container py-3">
 
-    @if(session('ok'))
+    @if(session('success'))
         <div class="alert alert-success shadow-sm">
-            {{ session('ok') }}
+            {{ session('success') }}
         </div>
     @endif
-
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ route('invoices.create') }}" class="btn btn-dark">
-            + สร้างใบแจ้งหนี้
-        </a>
-    </div>
 
     <div class="table-responsive shadow-sm rounded-3">
         <table class="table table-hover align-middle mb-0">
@@ -27,67 +21,82 @@
                 <tr>
                     <th>เลขที่ใบแจ้งหนี้</th>
                     <th>ลูกค้า</th>
-                    <th>วันที่ออก</th>
-                    <th>สถานะ</th>
+                    <th>อ้างอิงใบเสนอราคา</th>
+                    <th class="text-end">ยอดรวม</th>
+                    <th class="text-center">สถานะ</th>
                     <th class="text-center">จัดการ</th>
                 </tr>
             </thead>
+
             <tbody>
-                @forelse ($invoices as $i)
+                @forelse ($invoices as $inv)
                 <tr>
+
                     <td>
                         <strong>
-                            IV{{ str_pad($i->id_iv, 5, '0', STR_PAD_LEFT) }}
+                            INV{{ str_pad($inv->id_invoice, 5, '0', STR_PAD_LEFT) }}
                         </strong>
                     </td>
 
                     <td>
-                        {{ $i->customer->name_customer ?? '-' }}
+                        {{ $inv->customer->name_customer ?? '-' }}
                     </td>
 
                     <td>
-                        {{ \Carbon\Carbon::parse($i->date_iv)->format('d/m/Y') }}
+                        QT{{ str_pad($inv->id_quotation, 5, '0', STR_PAD_LEFT) }}
                     </td>
 
-                    <td>{{ $i->status }}</td>
+                    <td class="text-end">
+                        {{ number_format($inv->total, 2) }}
+                    </td>
+
+                    <td class="text-center">
+                        @if($inv->status == 'paid')
+                            <span class="badge bg-success">ชำระแล้ว</span>
+                        @else
+                            <span class="badge bg-warning text-dark">ยังไม่ชำระ</span>
+                        @endif
+                    </td>
 
                     <td class="text-center">
                         <div class="btn-group">
-                            <a href="{{ route('invoices.show', $i) }}"
+
+                            <!-- ดู -->
+                            <a href="{{ route('invoices.show', $inv->id_invoice) }}"
                                class="btn btn-sm btn-outline-primary">
                                 ดู
                             </a>
 
-                            <a href="{{ route('invoices.edit', $i) }}"
-                               class="btn btn-sm btn-outline-secondary">
-                                แก้ไข
-                            </a>
-
-                            <form action="{{ route('invoices.destroy', $i) }}"
+                            <!-- ลบ -->
+                            <form action="{{ route('invoices.destroy', $inv->id_invoice) }}"
                                   method="POST"
-                                  onsubmit="return confirm('ยืนยันลบใบแจ้งหนี้นี้?')">
+                                  onsubmit="return confirm('ยืนยันลบใบแจ้งหนี้?')">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger">
                                     ลบ
                                 </button>
                             </form>
+
                         </div>
                     </td>
+
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
+                    <td colspan="6" class="text-center text-muted py-4">
                         — ยังไม่มีใบแจ้งหนี้ —
                     </td>
                 </tr>
                 @endforelse
             </tbody>
+
         </table>
     </div>
 
     <div class="mt-3">
         {{ $invoices->links() }}
     </div>
+
 </div>
 @endsection

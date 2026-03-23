@@ -36,13 +36,25 @@
                     <strong>วันที่ออก:</strong>
                     {{ \Carbon\Carbon::parse($quotation->date_quot)->format('d/m/Y') }}
                 </p>
+
+                <!-- 🔥 แสดงสถานะ -->
+                <p>
+                    <strong>สถานะ:</strong>
+                    @if($quotation->status == 'draft')
+                        <span class="badge bg-secondary">ร่าง</span>
+                    @elseif($quotation->status == 'approved')
+                        <span class="badge bg-success">อนุมัติแล้ว</span>
+                    @elseif($quotation->status == 'rejected')
+                        <span class="badge bg-danger">ยกเลิก</span>
+                    @endif
+                </p>
             </div>
 
             <div class="table-responsive mb-4">
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th style="width:5%">#</th>
+                            <th style="width:5%">ลำดับ</th>
                             <th>รายการ</th>
                             <th class="text-center" style="width:15%">จำนวน</th>
                             <th class="text-end" style="width:20%">ราคาต่อหน่วย</th>
@@ -91,13 +103,64 @@
             </div>
 
             <div class="text-center mb-5">
+
+                <!-- ย้อนกลับ -->
                 <a href="{{ route('quotations.index') }}" class="btn btn-outline-secondary">
                     ย้อนกลับ
                 </a>
 
-                <a href="{{ route('quotations.word', $quotation) }}" class="btn btn-primary">
-                    ดาวน์โหลด Word
+                <!-- PDF -->
+                <a href="{{ route('quotation.pdf', $quotation->id_quot) }}"
+                   target="_blank"
+                   class="btn btn-info">
+                    ดาวน์โหลด PDF
                 </a>
+
+                <!-- ✏️ แก้ไข -->
+                @if ($quotation->status == 'draft')
+                    <a href="{{ route('quotations.edit', $quotation->id_quot) }}"
+                       class="btn btn-warning">
+                        ✏️ แก้ไข
+                    </a>
+                @endif
+
+                <!-- ✅ อนุมัติ -->
+                @if ($quotation->status == 'draft')
+                    <form action="{{ route('quotations.approve', $quotation->id_quot) }}"
+                          method="POST"
+                          style="display:inline;">
+                        @csrf
+                        <button class="btn btn-success">
+                            ✅ อนุมัติ
+                        </button>
+                    </form>
+                @endif
+
+                <!-- ❌ ยกเลิก -->
+                @if ($quotation->status == 'draft')
+                    <form action="{{ route('quotations.cancel', $quotation->id_quot) }}"
+                          method="POST"
+                          style="display:inline;"
+                          onsubmit="return confirm('ยืนยันยกเลิกใบเสนอราคา?')">
+                        @csrf
+                        <button class="btn btn-danger">
+                            ❌ ยกเลิก
+                        </button>
+                    </form>
+                @endif
+
+                <!-- 💰 สร้าง Invoice -->
+                @if ($quotation->status == 'approved')
+                    <form action="{{ route('invoices.createFromQuotation', $quotation->id_quot) }}"
+                          method="POST"
+                          style="display:inline;">
+                        @csrf
+                        <button class="btn btn-primary">
+                            💰 สร้างใบแจ้งหนี้
+                        </button>
+                    </form>
+                @endif
+
             </div>
 
         </div>

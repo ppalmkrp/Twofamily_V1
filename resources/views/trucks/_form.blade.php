@@ -1,5 +1,4 @@
 @php($mode = $mode ?? 'create')
-
 @php($ymax = now()->year)
 
 <div class="row g-3">
@@ -17,56 +16,47 @@
     </div>
 
     <div class="col-md-6">
-    <label class="form-label">จังหวัด</label>
-
-    <select name="province_truck"
-        class="form-select form-select-lg @error('province_truck') is-invalid @enderror"
-        required>
-
-        <option value="">— เลือกจังหวัด —</option>
-
-        @foreach ($provinces as $province)
-            <option value="{{ $province }}"
-                {{ old('province_truck', $truck->province_truck ?? '') == $province ? 'selected' : '' }}>
-                {{ $province }}
-            </option>
-        @endforeach
-    </select>
-
-    @error('province_truck')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
-
-
-    <div class="col-md-6">
-        <label class="form-label">ยี่ห้อ</label>
-
-        <select name="brand_truck" class="form-select form-select-lg @error('brand_truck') is-invalid @enderror"
+        <label class="form-label">จังหวัด</label>
+        <select name="province_truck" class="form-select form-select-lg @error('province_truck') is-invalid @enderror"
             required>
-
-            <option value="">— เลือกยี่ห้อรถ —</option>
-
-            <option value="HINO" {{ old('brand_truck', $truck->brand_truck ?? '') == 'HINO' ? 'selected' : '' }}>
-                HINO
-            </option>
-
-            <option value="ISUZU" {{ old('brand_truck', $truck->brand_truck ?? '') == 'ISUZU' ? 'selected' : '' }}>
-                ISUZU
-            </option>
+            <option value="">— เลือกจังหวัด —</option>
+            @foreach ($provinces as $province)
+                <option value="{{ $province }}"
+                    {{ old('province_truck', $truck->province_truck ?? '') == $province ? 'selected' : '' }}>
+                    {{ $province }}
+                </option>
+            @endforeach
         </select>
-
-        @error('brand_truck')
+        @error('province_truck')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
     <div class="col-md-6">
-        <label class="form-label">รุ่น</label>
-        <input type="text" name="model_truck" value="{{ old('model_truck', $truck->model_truck ?? '') }}"
-            class="form-control form-control-lg @error('model_truck') is-invalid @enderror"
-            placeholder="เช่น 500 Victor">
-        @error('model_truck')
+        <label class="form-label">ยี่ห้อ <span class="text-danger">*</span></label>
+        <select name="truck_brand_id" id="truck_brand_select"
+            class="form-select form-select-lg @error('truck_brand_id') is-invalid @enderror" required>
+            <option value="">— เลือกยี่ห้อรถ —</option>
+            @if (isset($brands))
+                @foreach ($brands as $brand)
+                    <option value="{{ $brand->id }}" @selected(old('truck_brand_id', $truck->truck_brand_id ?? '') == $brand->id)>
+                        {{ $brand->name_brand }}
+                    </option>
+                @endforeach
+            @endif
+        </select>
+        @error('truck_brand_id')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">รุ่น <span class="text-danger">*</span></label>
+        <select name="truck_model_id" id="truck_model_select"
+            class="form-select form-select-lg @error('truck_model_id') is-invalid @enderror" required disabled>
+            <option value="">— เลือกรุ่นรถ —</option>
+        </select>
+        @error('truck_model_id')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
@@ -110,12 +100,10 @@
         <input type="number" name="fuel_rate" value="{{ old('fuel_rate', $truck->fuel_rate ?? '') }}"
             class="form-control form-control-lg @error('fuel_rate') is-invalid @enderror" placeholder="เช่น 5.5"
             step="0.01" min="0" required>
-
         @error('fuel_rate')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
-
 
     <div class="col-md-6">
         <label class="form-label">สถานะ</label>
@@ -132,9 +120,9 @@
     </div>
 </div>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. ระบบจัดการทะเบียนรถ ---
         const input = document.getElementById('id_truck');
 
         // ล้างค่าให้เหลือเฉพาะ ก-ฮ และ 0-9
@@ -161,5 +149,58 @@
 
             input.value = format(front + back);
         });
+
+        // --- 2. ระบบ Dependent Dropdown (ยี่ห้อ -> รุ่น) ---
+        @if (isset($brands))
+            const brandsData = @json($brands);
+            const brandSelect = document.getElementById('truck_brand_select');
+            const modelSelect = document.getElementById('truck_model_select');
+
+            // ดึงค่าเก่าออกมา (ใช้ตอน validation ไม่ผ่าน หรือตอนกดแก้ไข)
+            const oldModelId = "{{ old('truck_model_id', $truck->truck_model_id ?? '') }}";
+
+            function updateModels() {
+                const selectedBrandId = brandSelect.value;
+
+                // ล้างข้อมูลรุ่นเก่า
+                modelSelect.innerHTML = '<option value="">— เลือกรุ่นรถ —</option>';
+
+                //  ถ้าไม่ได้เลือกยี่ห้อ (หรือกดกลับไปที่ "เลือกยี่ห้อรถ") ให้ล็อคช่องรุ่นไว้เหมือนเดิม
+                if (!selectedBrandId) {
+                    modelSelect.disabled = true;
+                    return;
+                }
+
+                //  ถ้ามีการเลือกยี่ห้อแล้ว ให้ปลดล็อคช่องรุ่น
+                modelSelect.disabled = false;
+
+                // หายี่ห้อที่ตรงกับที่เลือก
+                const selectedBrand = brandsData.find(b => b.id == selectedBrandId);
+
+                // ถ้ายี่ห้อนี้มีรุ่น ให้สร้างตัวเลือก
+                if (selectedBrand && selectedBrand.models) {
+                    selectedBrand.models.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = model.name_model;
+
+                        // ถ้ารุ่นตรงกับค่าเก่าที่เคยเลือกไว้ ให้ selected ทันที
+                        if (model.id == oldModelId) {
+                            option.selected = true;
+                        }
+
+                        modelSelect.appendChild(option);
+                    });
+                }
+            }
+
+            // สั่งทำงานเมื่อมีการเปลี่ยนยี่ห้อ
+            brandSelect.addEventListener('change', updateModels);
+
+            // สั่งทำงาน 1 ครั้งตอนเปิดหน้าเว็บ (เพื่อโหลดข้อมูลเก่ามาแสดงทันที)
+            if (brandSelect.value) {
+                updateModels();
+            }
+        @endif
     });
 </script>

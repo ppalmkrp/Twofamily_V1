@@ -15,7 +15,7 @@ return new class extends Migration {
 
             $table->date('date_quot');
             $table->date('end_quot')->nullable();
-            $table->enum('status', ['draft', 'sent', 'approved', 'rejected'])
+            $table->enum('status', ['draft', 'approved', 'rejected'])
                   ->default('draft');
 
             $table->integer('subtotal')->default(0);

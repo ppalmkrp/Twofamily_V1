@@ -259,4 +259,20 @@ class CustomerController extends Controller
     {
         return view('customers.show', compact('customer'));
     }
+    public function storeAjax(Request $request)
+    {
+        $customer = Customer::create([
+            'name_customer' => $request->name_customer,
+            'customer_type' => $request->customer_type,
+            'phone_customer' => $request->phone_customer,
+            'email_customer' => $request->email_customer,
+            'address_detail' => $request->address_detail,
+            'subdistrict' => $request->subdistrict,
+            'district' => $request->district,
+            'province' => $request->province,
+            'zipcode' => $request->zipcode,
+        ]);
+
+        return response()->json($customer);
+    }
 }

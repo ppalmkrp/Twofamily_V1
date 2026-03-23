@@ -60,7 +60,6 @@
                             <th>รุ่น</th>
                             <th>ปีที่ซื้อ</th>
                             <th>จังหวัด</th>
-
                             <th>สถานะ</th>
                             <th class="action-col text-center">จัดการ</th>
                         </tr>
@@ -69,20 +68,27 @@
                         @forelse($trucks as $t)
                             <tr>
                                 <td class="fw-semibold">{{ $t->id_truck }}</td>
-                                <td>{{ $t->brand_truck }}</td>
-                                <td>{{ $t->model_truck }}</td>
+                                <td>{{ $t->brand->name_brand ?? '-' }}</td>
+                                <td>{{ $t->model->name_model ?? '-' }}</td>
                                 <td>{{ $t->year_truck }}</td>
                                 <td>{{ $t->province_truck }}</td>
                                 <td>
                                     @php
-                                        $badge =
-                                            [
-                                                'active' => 'success',
-                                                'maintenance' => 'warning',
-                                                'retired' => 'secondary',
-                                            ][$t->status_truck] ?? 'secondary';
+                                        // ตั้งค่าสี
+                                        $badge = [
+                                            'active' => 'success',
+                                            'maintenance' => 'warning',
+                                            'retired' => 'secondary',
+                                        ][$t->status_truck] ?? 'secondary';
+
+                                        // แปลเป็นภาษาไทยให้โชว์บนหน้าเว็บสวยๆ
+                                        $statusText = [
+                                            'active' => 'พร้อมใช้งาน',
+                                            'maintenance' => 'ซ่อมบำรุง',
+                                            'retired' => 'ปลดประจำการ',
+                                        ][$t->status_truck] ?? 'ไม่ระบุ';
                                     @endphp
-                                    <span class="badge bg-{{ $badge }}">{{ $t->status_truck }}</span>
+                                    <span class="badge bg-{{ $badge }}">{{ $statusText }}</span>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-inline-flex gap-2">
@@ -100,7 +106,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">ไม่พบข้อมูล</td>
+                                <td colspan="7" class="text-center text-muted py-4">ไม่พบข้อมูล</td>
                             </tr>
                         @endforelse
                     </tbody>

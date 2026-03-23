@@ -16,8 +16,8 @@ class Truck extends Model
 
     protected $fillable = [
         'id_truck',
-        'brand_truck',
-        'model_truck',
+'truck_brand_id',
+        'truck_model_id',
         'year_truck',
         'province_truck',
         'fuel_rate',
@@ -35,5 +35,15 @@ class Truck extends Model
     public function fuelRecords()
     {
         return $this->hasMany(FuelRecord::class, 'trucks_id_truck', 'id_truck');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(TruckBrand::class, 'truck_brand_id');
+    }
+
+    public function model()
+    {
+        return $this->belongsTo(TruckModel::class, 'truck_model_id');
     }
 }

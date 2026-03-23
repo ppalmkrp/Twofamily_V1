@@ -12,7 +12,9 @@ return new class extends Migration
             $table->id('id_fuel_record');
             $table->date('date_record');
             $table->string('start_point', 255);
+            $table->text('start_detail')->nullable(); //เพิ่มบรรทัดนี้
             $table->string('destination', 255);
+            $table->text('destination_detail')->nullable(); //เพิ่มบรรทัดนี้
 
             $table->integer('age_truck')->nullable();
             $table->integer('depreciation')->nullable();
@@ -20,8 +22,15 @@ return new class extends Migration
             $table->integer('max_load')->nullable();
             $table->integer('distance')->nullable();
 
-            $table->integer('cost_fuel')->nullable();
-            $table->decimal('cost_fuel_total', 10, 2)->nullable(); // ✅ เพิ่มตรงนี้
+            // $table->integer('cost_fuel')->nullable();
+            $table->decimal('cost_fuel', 10, 2)->nullable();
+            $table->decimal('cost_fuel_total', 10, 2)->nullable(); //เพิ่มตรงนี้
+
+
+
+
+
+
 
             $table->timestamps();
             $table->softDeletes();

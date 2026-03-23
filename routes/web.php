@@ -1,68 +1,134 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TruckController;
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\FuelRecordController;
-use App\Http\Controllers\ProductTypeController;
-use App\Http\Controllers\TransportJobController;
-use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\{
+    TruckController,
+    DriverController,
+    DashboardController,
+    ProductController,
+    CustomerController,
+    InvoiceController,
+    FuelRecordController,
+    ProductTypeController,
+    TransportJobController,
+    QuotationController,
+    TruckBrandController,
+    TruckModelController,
+    SettingController,
+    ReceiptController
+};
 
-/**
- * ถ้า "ยังไม่ล็อกอิน" -> แสดงหน้า welcome
- * ถ้า "ล็อกอินแล้ว"     -> ส่งไปหน้า dashboard
- */
+/*
+|--------------------------------------------------------------------------
+| หน้าแรก
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
         : view('welcome');
 })->name('welcome');
 
-/**
- * เส้นทางหลังล็อกอิน + ใช้ session ของ Jetstream + ยืนยันอีเมลแล้ว
- */
+/*
+|--------------------------------------------------------------------------
+| หลังล็อกอิน
+|--------------------------------------------------------------------------
+*/
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
-
-    Route::resource('trucks', TruckController::class)->except(['show']);
-
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    /*
+    |--------------------------------------------------------------------------
+    | Master Data
+    |--------------------------------------------------------------------------
+    */
     Route::resource('customers', CustomerController::class);
-
     Route::resource('drivers', DriverController::class);
-
-    Route::resource('transport-jobs', TransportJobController::class);
-
-    Route::resource('fuel_records', FuelRecordController::class);
-
     Route::resource('products', ProductController::class);
-
-
-
     Route::resource('product_types', ProductTypeController::class);
 
+    Route::resource('truck_brands', TruckBrandController::class);
+    Route::resource('truck_models', TruckModelController::class);
+    Route::resource('trucks', TruckController::class)->except(['show']);
 
-    Route::get(
-        'invoices/{invoice}/word',
-        [InvoiceController::class, 'downloadWord']
-    )->name('invoices.word');
+    /*
+    |--------------------------------------------------------------------------
+    | Operations
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('transport-jobs', TransportJobController::class);
+    Route::resource('fuel_records', FuelRecordController::class);
 
-    Route::get(
-        'quotations/{quotation}/word',
-        [QuotationController::class, 'downloadWord']
-    )->name('quotations.word');
-
-
-    Route::resource('invoices', InvoiceController::class);
+    /*
+    |--------------------------------------------------------------------------
+    | Quotation
+    |--------------------------------------------------------------------------
+    */
     Route::resource('quotations', QuotationController::class);
+
+    Route::post('/quotations/{id}/cancel', [QuotationController::class, 'cancel'])
+    ->name('quotations.cancel');
+
+    Route::post('/quotations/{id}/approve', [QuotationController::class, 'approve'])
+        ->name('quotations.approve');
+
+    Route::get('/quotation/{quotation}/pdf', [QuotationController::class, 'downloadPDF'])
+        ->name('quotation.pdf');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Invoice
+    |--------------------------------------------------------------------------
+    */
+    Route::resource('invoices', InvoiceController::class)->only(['index', 'show', 'destroy']);
+
+    Route::post('/invoices/create/{id}', [InvoiceController::class, 'createFromQuotation'])
+        ->name('invoices.createFromQuotation');
+
+    Route::post('/invoices/{id}/pay', [InvoiceController::class, 'pay'])
+        ->name('invoices.pay');
+
+    Route::get('/invoice/{id}/pdf', [InvoiceController::class, 'pdf'])
+        ->name('invoice.pdf');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Receipt
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/receipts/create/{id}', [ReceiptController::class, 'createFromInvoice'])
+        ->name('receipts.createFromInvoice');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+
+    Route::get('/settings/documents', [SettingController::class, 'documents'])->name('settings.documents');
+
+    Route::get('/settings/documents/quotation', [SettingController::class, 'quotation'])->name('settings.quotation');
+
+    Route::post('/settings/documents/quotation', [SettingController::class, 'quotationUpdate'])
+        ->name('settings.quotation.update');
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/customers/ajax', [CustomerController::class, 'storeAjax'])
+        ->name('customers.store.ajax');
 });

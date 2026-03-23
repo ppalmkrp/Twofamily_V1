@@ -45,37 +45,127 @@
                 <input type="text" name="address_detail" class="form-control" placeholder="เช่น 123/45 หมู่ 6">
             </div>
 
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">ตำบล</label>
-                    <input type="text" name="subdistrict" class="form-control" placeholder="เช่น ศิลา">
-                </div>
+            <div class="row g-3 mt-2">
 
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">อำเภอ</label>
-                    <input type="text" name="district" class="form-control" placeholder="เช่น เมืองขอนแก่น">
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">จังหวัด</label>
-                    <select name="province" class="form-select">
+                <div class="col-md-3">
+                    <label>จังหวัด</label>
+                    <select id="province" name="province" class="form-select" required>
                         <option value="">— เลือกจังหวัด —</option>
-                        @foreach ($provinces as $p)
-                            <option value="{{ $p }}">{{ $p }}</option>
-                        @endforeach
                     </select>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">รหัสไปรษณีย์</label>
-                <input type="text" name="zipcode" class="form-control" maxlength="5" pattern="[0-9]{5}"
-                    inputmode="numeric" placeholder="เช่น 40000">
-            </div>
+                <div class="col-md-3">
+                    <label>อำเภอ</label>
+                    <select id="district" name="district" class="form-select" disabled required>
+                        <option value="">— เลือกอำเภอ —</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label>ตำบล</label>
+                    <select id="subdistrict" name="subdistrict" class="form-select" disabled required>
+                        <option value="">— เลือกตำบล —</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label>รหัสไปรษณีย์</label>
+                    <input type="text" id="zipcode" name="zipcode" class="form-control bg-light" readonly>
+                </div>
+
+            </div><br>
 
             <button class="btn btn-dark">บันทึก</button>
             <a href="{{ route('customers.index') }}" class="btn btn-outline-secondary">ย้อนกลับ</a>
 
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const apiURL =
+                'https://raw.githubusercontent.com/kongvut/thai-province-data/master/api/latest/province_with_district_and_sub_district.json';
+
+            let thaiData = [];
+
+            const province = document.getElementById('province');
+            const district = document.getElementById('district');
+            const subdistrict = document.getElementById('subdistrict');
+            const zipcode = document.getElementById('zipcode');
+
+            // 🔥 เช็คว่าหา element เจอไหม
+            console.log(province, district, subdistrict);
+
+            // โหลดข้อมูลจังหวัด
+            fetch(apiURL)
+                .then(res => res.json())
+                .then(data => {
+                    thaiData = data;
+
+                    console.log("โหลดจังหวัดสำเร็จ", data.length);
+
+                    data.forEach(p => {
+                        province.add(new Option(p.name_th, p.name_th));
+                    });
+                })
+                .catch(err => {
+                    console.error("โหลด API ไม่ได้", err);
+                });
+
+            // จังหวัด → อำเภอ
+            province.addEventListener('change', function() {
+
+                district.innerHTML = '<option value="">— เลือกอำเภอ —</option>';
+                subdistrict.innerHTML = '<option value="">— เลือกตำบล —</option>';
+                zipcode.value = '';
+
+                district.disabled = true;
+                subdistrict.disabled = true;
+
+                const p = thaiData.find(x => x.name_th === this.value);
+                if (!p) return;
+
+                const districts = p.amphure || p.districts || p.district || [];
+
+                districts.forEach(d => {
+                    district.add(new Option(d.name_th, d.name_th));
+                });
+
+                district.disabled = false;
+            });
+
+            district.addEventListener('change', function() {
+
+                subdistrict.innerHTML = '<option value="">— เลือกตำบล —</option>';
+                zipcode.value = '';
+
+                subdistrict.disabled = true;
+
+                const p = thaiData.find(x => x.name_th === province.value);
+                if (!p) return;
+
+                const districts = p.amphure || p.districts || p.district || [];
+                const d = districts.find(x => x.name_th === this.value);
+                if (!d) return;
+
+                const subs = d.tambon || d.sub_districts || d.subdistricts || [];
+
+                subs.forEach(s => {
+                    let option = new Option(s.name_th, s.name_th);
+                    option.dataset.zip = s.zip_code;
+                    subdistrict.add(option);
+                });
+
+                subdistrict.disabled = false;
+            });
+
+            // ตำบล → zipcode
+            subdistrict.addEventListener('change', function() {
+                const selected = this.selectedOptions[0];
+                zipcode.value = selected?.dataset?.zip || '';
+            });
+
+        });
+    </script>
 @endsection

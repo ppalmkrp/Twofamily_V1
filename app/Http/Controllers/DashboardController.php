@@ -18,11 +18,12 @@ class DashboardController extends Controller
 
         $driversTotal  = Driver::count();
 
-        // ไม่พึ่ง created_at ของ trucks
-        $latestTrucks  = Truck::select('id_truck', 'brand_truck', 'model_truck', 'status_truck')
+        $latestTrucks  = Truck::with(['brand', 'model'])
+            ->select('id_truck', 'truck_brand_id', 'truck_model_id', 'status_truck')
             ->limit(5)->get();
 
-        $latestDrivers = Driver::select('id_driver', 'name_driver', 'phone_driver')
+        //  แก้ไขตรงนี้: เปลี่ยนมาดึง fname_driver และ lname_driver แทน
+        $latestDrivers = Driver::select('id_driver', 'fname_driver', 'lname_driver', 'phone_driver')
             ->orderByDesc('id_driver')->limit(5)->get();
 
         return view('dashboard', compact('truckCounts', 'driversTotal', 'latestTrucks', 'latestDrivers'));

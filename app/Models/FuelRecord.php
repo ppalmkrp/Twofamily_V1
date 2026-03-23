@@ -14,7 +14,9 @@ class FuelRecord extends Model
     protected $fillable = [
         'date_record',
         'start_point',
+        'start_detail',
         'destination',
+        'destination_detail',
         'age_truck',
         'depreciation',
         'current_weight',
