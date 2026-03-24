@@ -56,7 +56,6 @@
 
 <body>
 
-    <!-- HEADER -->
     <table width="100%">
         <tr>
             <td>
@@ -77,7 +76,6 @@
 
     <div class="line"></div>
 
-    <!-- CUSTOMER -->
     <table width="100%" class="small">
         <tr>
             <td width="60%">
@@ -102,7 +100,6 @@
 
     <div class="line"></div>
 
-    <!-- ITEMS -->
     <table class="table small">
         <thead>
             <tr>
@@ -137,7 +134,6 @@
                 </tr>
             @endforeach
 
-            <!-- เว้นช่องให้เหมือนฟอร์ม -->
             @for ($i; $i <= 8; $i++)
                 <tr>
                     <td>&nbsp;</td>
@@ -154,7 +150,6 @@
 
     <br>
 
-    <!-- TOTAL -->
     <table width="100%" class="small">
         <tr>
             <td width="60%">
@@ -185,7 +180,6 @@
 
     <div class="line"></div>
 
-    <!-- SIGN -->
     <table width="100%" class="small">
         <tr>
             <td class="text-center">

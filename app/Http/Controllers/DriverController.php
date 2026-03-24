@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule; //  อย่าลืมบรรทัดนี้ ต้องใช้สำหรับทำเงื่อนไขเช็คชื่อซ้ำ
+use Illuminate\Support\Facades\Storage;
 
 class DriverController extends Controller
 {
@@ -60,17 +61,26 @@ class DriverController extends Controller
             'citizenid_driver.unique' => 'เลขบัตรประชาชนนี้ ถูกใช้งานไปแล้ว!'
         ]);
 
-        Driver::create($request->only([
-            'fname_driver',
-            'lname_driver',
-            'address_detail',
-            'subdistrict',
-            'district',
-            'province',
-            'zipcode',
-            'phone_driver',
-            'citizenid_driver',
-        ]));
+        Driver::create([
+            'fname_driver' => $request->fname_driver,
+            'lname_driver' => $request->lname_driver,
+            'address_detail' => $request->address_detail,
+            'province' => $request->province,
+            'district' => $request->district,
+            'subdistrict' => $request->subdistrict,
+            'zipcode' => $request->zipcode,
+            'phone_driver' => $request->phone_driver,
+            'citizenid_driver' => $request->citizenid_driver,
+            'citizen_image' => $citizenPath ?? null,
+        ]);
+
+        $request->validate([
+            'citizen_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        if ($request->hasFile('citizen_image')) {
+            $citizenPath = $request->file('citizen_image')->store('citizens', 'public');
+        }
 
         return redirect()
             ->route('drivers.index')
@@ -87,7 +97,6 @@ class DriverController extends Controller
     public function update(Request $request, Driver $driver)
     {
         $request->validate([
-            //  เช็คชื่อซ้ำเหมือนหน้า Store แต่อนุญาตให้เป็นชื่อเดิมของตัวเองได้ (ignore)
             'fname_driver' => [
                 'required',
                 'string',
@@ -95,36 +104,49 @@ class DriverController extends Controller
                 Rule::unique('drivers', 'fname_driver')
                     ->where('lname_driver', $request->lname_driver)
                     ->whereNull('deleted_at')
-                    ->ignore($driver->id_driver, 'id_driver') // ข้ามการเช็คตัวเอง
+                    ->ignore($driver->id_driver, 'id_driver')
             ],
             'lname_driver'  => 'required|string|max:255',
             'province'      => 'nullable|string|max:100',
             'phone_driver'  => 'nullable|digits:10',
             'citizenid_driver' => 'nullable|digits:13|unique:drivers,citizenid_driver,' . $driver->id_driver . ',id_driver',
             'zipcode'       => 'nullable|digits:5',
+
+            // 🔥 เพิ่มตรงนี้
+            'citizen_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'fname_driver.unique' => 'ชื่อและนามสกุลนี้ มีอยู่ในระบบแล้ว กรุณาตรวจสอบอีกครั้ง!',
             'citizenid_driver.unique' => 'เลขบัตรประชาชนนี้ ถูกใช้งานไปแล้ว!'
         ]);
 
-        $driver->update($request->only([
-            'fname_driver',
-            'lname_driver',
-            'address_detail',
-            'subdistrict',
-            'district',
-            'province',
-            'zipcode',
-            'phone_driver',
-            'citizenid_driver',
-        ]));
+        if ($request->hasFile('citizen_image')) {
+
+            if ($driver->citizen_image && Storage::disk('public')->exists($driver->citizen_image)) {
+                Storage::disk('public')->delete($driver->citizen_image);
+            }
+
+            $citizenPath = $request->file('citizen_image')->store('citizens', 'public');
+        }
+
+        $driver->update([
+            'fname_driver' => $request->fname_driver,
+            'lname_driver' => $request->lname_driver,
+            'address_detail' => $request->address_detail,
+            'subdistrict' => $request->subdistrict,
+            'district' => $request->district,
+            'province' => $request->province,
+            'zipcode' => $request->zipcode,
+            'phone_driver' => $request->phone_driver,
+            'citizenid_driver' => $request->citizenid_driver,
+
+            'citizen_image' => $citizenPath ?? $driver->citizen_image,
+        ]);
 
         return redirect()
             ->route('drivers.index')
             ->with('ok', 'แก้ไขข้อมูลเรียบร้อย');
     }
 
-    //  ลบ (soft delete)
     public function destroy(Driver $driver)
     {
         $driver->delete();

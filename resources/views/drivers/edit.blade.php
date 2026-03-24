@@ -9,12 +9,10 @@
 @section('content')
     <div class="container py-4">
 
-        {{-- แสดงข้อความสำเร็จ --}}
         @if (session('ok'))
             <div class="alert alert-success">{{ session('ok') }}</div>
         @endif
 
-        {{-- กล่องรวม Error --}}
         @if ($errors->any())
             <div class="alert alert-danger shadow-sm">
                 <div class="fw-semibold mb-1">กรุณาตรวจสอบข้อมูล:</div>
@@ -26,7 +24,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('drivers.update', $driver) }}">
+        <form method="POST" action="{{ route('drivers.update', $driver) }}" enctype="multipart/form-data">
             @csrf @method('PUT')
 
             <div class="row g-3 mb-3">
@@ -52,8 +50,6 @@
             </div>
 
             <div class="row g-3 mt-2">
-                <h5 class="mb-0 text-primary"><i class="bi bi-geo-alt-fill"></i> ข้อมูลที่อยู่</h5>
-                <hr class="mt-2 mb-1">
 
                 <div class="col-md-12">
                     <label class="form-label">รายละเอียดที่อยู่ (บ้านเลขที่ / หมู่ / ซอย)</label>
@@ -66,7 +62,6 @@
                     @enderror
                 </div>
 
-                {{-- ซ่อนค่าเก่าไว้ให้ JavaScript อ่าน เพื่อดึงข้อมูลเดิมมาเลือกให้อัตโนมัติ --}}
                 <input type="hidden" id="old_province" value="{{ old('province', $driver->province ?? '') }}">
                 <input type="hidden" id="old_district" value="{{ old('district', $driver->district ?? '') }}">
                 <input type="hidden" id="old_subdistrict" value="{{ old('subdistrict', $driver->subdistrict ?? '') }}">
@@ -116,10 +111,8 @@
 
             <div class="mb-3 mt-4">
                 <label class="form-label">เบอร์โทร (10 หลัก)</label>
-                <input type="text" name="phone_driver"
-                    class="form-control @error('phone_driver') is-invalid @enderror"
-                    maxlength="10" pattern="[0-9]{10}"
-                    inputmode="numeric" placeholder="เช่น 0812345678"
+                <input type="text" name="phone_driver" class="form-control @error('phone_driver') is-invalid @enderror"
+                    maxlength="10" pattern="[0-9]{10}" inputmode="numeric" placeholder="เช่น 0812345678"
                     value="{{ old('phone_driver', $driver->phone_driver ?? '') }}">
                 @error('phone_driver')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -129,13 +122,30 @@
             <div class="mb-4">
                 <label class="form-label">เลขบัตรประชาชน (13 หลัก)</label>
                 <input type="text" name="citizenid_driver"
-                    class="form-control @error('citizenid_driver') is-invalid @enderror"
-                    maxlength="13" pattern="[0-9]{13}"
+                    class="form-control @error('citizenid_driver') is-invalid @enderror" maxlength="13" pattern="[0-9]{13}"
                     inputmode="numeric" placeholder="เช่น 1234567890123"
                     value="{{ old('citizenid_driver', $driver->citizenid_driver ?? '') }}">
                 @error('citizenid_driver')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">รูปใบขับขี่</label>
+
+                <input type="file" name="citizen_image"
+                    class="form-control @error('citizen_image') is-invalid @enderror">
+
+                @error('citizen_image')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+
+                @if ($driver->citizen_image)
+                    <div class="mt-2">
+                        <img src="{{ asset('storage/' . $driver->citizen_image) }}" width="150"
+                            class="border rounded">
+                    </div>
+                @endif
             </div>
 
             <button class="btn btn-dark">บันทึกการแก้ไข</button>
@@ -195,11 +205,13 @@
 
                 const selectedProv = thaiData.find(p => p.name_th === this.value);
                 if (selectedProv) {
-                    const districts = selectedProv.amphure || selectedProv.district || selectedProv.districts || [];
+                    const districts = selectedProv.amphure || selectedProv.district || selectedProv
+                        .districts || [];
 
                     districts.forEach(dist => {
                         const option = new Option(dist.name_th, dist.name_th);
-                        if (dist.name_th === oldDistrict && this.value === oldProvince) option.selected = true;
+                        if (dist.name_th === oldDistrict && this.value === oldProvince) option
+                            .selected = true;
                         districtSelect.add(option);
                     });
 
@@ -223,15 +235,18 @@
 
                 const selectedProv = thaiData.find(p => p.name_th === provinceSelect.value);
                 if (selectedProv) {
-                    const districts = selectedProv.amphure || selectedProv.district || selectedProv.districts || [];
+                    const districts = selectedProv.amphure || selectedProv.district || selectedProv
+                        .districts || [];
                     const selectedDist = districts.find(d => d.name_th === this.value);
 
                     if (selectedDist) {
-                        const subDistricts = selectedDist.tambon || selectedDist.sub_district || selectedDist.sub_districts || [];
+                        const subDistricts = selectedDist.tambon || selectedDist.sub_district ||
+                            selectedDist.sub_districts || [];
 
                         subDistricts.forEach(sub => {
                             const option = new Option(sub.name_th, sub.name_th);
-                            if (sub.name_th === oldSubdistrict && this.value === oldDistrict) option.selected = true;
+                            if (sub.name_th === oldSubdistrict && this.value === oldDistrict) option
+                                .selected = true;
                             subdistrictSelect.add(option);
                         });
 
@@ -251,11 +266,13 @@
 
                 const selectedProv = thaiData.find(p => p.name_th === provinceSelect.value);
                 if (selectedProv) {
-                    const districts = selectedProv.amphure || selectedProv.district || selectedProv.districts || [];
+                    const districts = selectedProv.amphure || selectedProv.district || selectedProv
+                        .districts || [];
                     const selectedDist = districts.find(d => d.name_th === districtSelect.value);
 
                     if (selectedDist) {
-                        const subDistricts = selectedDist.tambon || selectedDist.sub_district || selectedDist.sub_districts || [];
+                        const subDistricts = selectedDist.tambon || selectedDist.sub_district ||
+                            selectedDist.sub_districts || [];
                         const selectedSub = subDistricts.find(s => s.name_th === this.value);
 
                         if (selectedSub) {

@@ -233,12 +233,12 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a href="{{ route('transport-jobs.index') }}"
                                 class="nav-link {{ request()->routeIs('transport-jobs.*') ? 'active' : '' }}">
                                 <span>แผนงานขนส่ง</span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         <li class="nav-item">
                             <a href="{{ route('fuel_records.index') }}"
@@ -247,7 +247,6 @@
                             </a>
                         </li>
 
-                        <!-- เอกสาร (COLLAPSE) -->
                         @php
                             $isDocPage =
                                 request()->routeIs('quotations.*') ||
@@ -258,14 +257,12 @@
 
                         <li class="nav-item">
 
-                            {{-- ปุ่มหลัก --}}
                             <a class="nav-link {{ $isDocPage ? 'active' : '' }}" data-bs-toggle="collapse"
                                 href="#docMenu" role="button" aria-expanded="{{ $isDocPage ? 'true' : 'false' }}">
                                 <span>เอกสาร</span>
                                 <i class="bi bi-caret-down-fill arrow"></i>
                             </a>
 
-                            {{-- submenu --}}
                             <div class="collapse submenu {{ $isDocPage ? 'show' : '' }}" id="docMenu">
 
                                 <a href="{{ route('quotations.index') }}"
@@ -277,14 +274,15 @@
                                     class="sub-link {{ request()->routeIs('invoices.*') ? 'active' : '' }}">
                                     ใบแจ้งหนี้
                                 </a>
-
-                                {{-- อนาคต --}}
-                                {{-- receipts.*, tax-invoices.* --}}
+                                <a href="{{ route('receipts.index') }}"
+                                    class="sub-link {{ request()->routeIs('receipts.*') ? 'active' : '' }}">
+                                    ใบเสร็จ
+                                </a>
                             </div>
                         </li>
 
                     </ul>
-                    <!-- USER -->
+
                     @auth
                         <div class="dropdown pb-3">
                             <a href="#" class="text-white text-decoration-none dropdown-toggle"

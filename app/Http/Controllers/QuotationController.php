@@ -13,7 +13,6 @@ use Carbon\Carbon;
 
 class QuotationController extends Controller
 {
-    /* ====================== CRUD ====================== */
 
     public function index()
     {
@@ -129,8 +128,7 @@ class QuotationController extends Controller
     {
         $quotation = Quotation::findOrFail($id);
 
-        // ถ้ามี relation เช่น details
-        $quotation->details()->delete(); // ถ้ามี
+        $quotation->details()->delete();
 
         $quotation->delete();
 
@@ -148,18 +146,17 @@ class QuotationController extends Controller
     }
 
     public function cancel($id)
-{
-    $q = Quotation::findOrFail($id);
+    {
+        $q = Quotation::findOrFail($id);
 
-    // ป้องกันยกเลิกซ้ำ
-    if ($q->status != 'draft') {
-        return back()->with('ok', 'ไม่สามารถยกเลิกได้');
+        if ($q->status != 'draft') {
+            return back()->with('ok', 'ไม่สามารถยกเลิกได้');
+        }
+
+        $q->status = 'rejected';
+        $q->save();
+
+        return redirect()->route('quotations.show', $q->id_quot)
+            ->with('ok', 'ยกเลิกใบเสนอราคาแล้ว');
     }
-
-    $q->status = 'rejected';
-    $q->save();
-
-    return redirect()->route('quotations.show', $q->id_quot)
-        ->with('ok', 'ยกเลิกใบเสนอราคาแล้ว');
-}
 }

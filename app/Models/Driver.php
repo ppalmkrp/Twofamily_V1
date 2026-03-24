@@ -15,11 +15,12 @@ class Driver extends Model
         'fname_driver',
         'lname_driver',
         'address_detail',
-        'subdistrict',
-        'district',
         'province',
+        'district',
+        'subdistrict',
         'zipcode',
         'phone_driver',
         'citizenid_driver',
+        'citizen_image',
     ];
 }

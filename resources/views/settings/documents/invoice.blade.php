@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('namepage')
-    ตั้งค่าใบเสนอราคา
+    ตั้งค่าใบแจ้งหนี้
 @endsection
 
 @section('content')
@@ -14,7 +14,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('settings.quotation.update') }}">
+        <form method="POST" action="{{ route('settings.invoice.update') }}">
             @csrf
 
             <div class="row g-3">
@@ -24,14 +24,14 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label>ชื่อบริษัท (ผู้ออกเอกสาร)</label>
+                    <label>ชื่อบริษัท</label>
                     <input type="text" class="form-control" name="company_name"
                         value="{{ $settings['company_name'] ?? '' }}">
                 </div>
 
                 <div class="col-md-12">
-                    <label>ที่อยู่บริษัท</label>
-                    <textarea class="form-control" rows="2" name="company_address">{{ $settings['company_address'] ?? '' }}</textarea>
+                    <label>ที่อยู่</label>
+                    <textarea class="form-control" name="company_address">{{ $settings['company_address'] ?? '' }}</textarea>
                 </div>
 
                 <div class="col-md-6">
@@ -49,18 +49,42 @@
                 <hr>
 
                 <div class="col-12">
-                    <h5>ข้อมูลใบเสนอราคา</h5>
+                    <h5>ข้อมูลใบแจ้งหนี้</h5>
                 </div>
 
                 <div class="col-md-4">
                     <label>เครดิต (วัน)</label>
-                    <input type="number" class="form-control" name="quotation_credit_term"
-                        value="{{ $settings['quotation_credit_term'] ?? 14 }}">
+                    <input type="number" class="form-control" name="credit_term"
+                        value="{{ $settings['credit_term'] ?? 7 }}">
                 </div>
 
                 <div class="col-12">
                     <label>หมายเหตุ</label>
-                    <textarea class="form-control" rows="3" name="quotation_note">{{ $settings['quotation_note'] ?? '' }}</textarea>
+                    <textarea class="form-control" name="invoice_note">{{ $settings['invoice_note'] ?? '' }}</textarea>
+                </div>
+
+                <hr>
+
+                <div class="col-12">
+                    <h5>บัญชีธนาคาร</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label>ธนาคาร</label>
+                    <input type="text" class="form-control" name="bank_name"
+                        value="{{ $settings['bank_name'] ?? '' }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label>ชื่อบัญชี</label>
+                    <input type="text" class="form-control" name="bank_account_name"
+                        value="{{ $settings['bank_account_name'] ?? '' }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label>เลขบัญชี</label>
+                    <input type="text" class="form-control" name="bank_account"
+                        value="{{ $settings['bank_account'] ?? '' }}">
                 </div>
 
             </div>
@@ -70,7 +94,7 @@
                     กลับ
                 </a>
 
-                <button type="submit" class="btn btn-primary">
+                <button class="btn btn-primary">
                     บันทึก
                 </button>
             </div>

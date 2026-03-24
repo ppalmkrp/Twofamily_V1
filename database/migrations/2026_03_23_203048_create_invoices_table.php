@@ -12,23 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invoices', function (Blueprint $table) {
-    $table->bigIncrements('id_invoice');
+            $table->bigIncrements('id_invoice');
 
-    $table->unsignedBigInteger('id_quotation');
-    $table->unsignedInteger('id_customer');
+            $table->unsignedBigInteger('id_quotation');
+            $table->unsignedInteger('id_customer');
 
-    $table->decimal('total', 10, 2)->default(0);
-    $table->string('status')->default('unpaid'); // unpaid / paid
+            $table->decimal('total', 10, 2)->default(0);
+            $table->decimal('discount', 10, 2)->default(0);
 
-    $table->timestamps();
+            $table->string('status')->default('unpaid');
 
-    $table->foreign('id_quotation')
-        ->references('id_quot')->on('quotations')
-        ->onDelete('cascade');
+            $table->timestamps();
 
-    $table->foreign('id_customer')
-        ->references('id_customer')->on('customers');
-});
+            $table->foreign('id_quotation')
+                ->references('id_quot')->on('quotations')
+                ->onDelete('cascade');
+
+            $table->foreign('id_customer')
+                ->references('id_customer')->on('customers');
+        });
     }
 
     /**

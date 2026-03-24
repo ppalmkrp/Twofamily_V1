@@ -30,14 +30,12 @@
 
                         <h5 class="mb-3">เพิ่มลูกค้า</h5>
 
-                        <!-- ชื่อลูกค้า -->
                         <div class="mb-3">
                             <label class="form-label">ชื่อลูกค้า</label>
                             <input type="text" id="name_customer" class="form-control"
                                 placeholder="เช่น บริษัท ทูแฟมิลี่ เอ็นจิเนียริ่ง จำกัด หรือ นายกรภัทร สิงวะราช">
                         </div>
 
-                        <!-- ประเภทลูกค้า -->
                         <div class="mb-3">
                             <label class="form-label">ประเภทลูกค้า</label>
                             <select id="customer_type" class="form-select">
@@ -49,26 +47,22 @@
                             </div>
                         </div>
 
-                        <!-- เบอร์ -->
                         <div class="mb-3">
                             <label class="form-label">เบอร์โทร (10 หลัก)</label>
                             <input type="text" id="phone_customer" class="form-control" placeholder="เช่น 0812345678">
                         </div>
 
-                        <!-- อีเมล -->
                         <div class="mb-3">
                             <label class="form-label">อีเมล</label>
                             <input type="email" id="email_customer" class="form-control"
                                 placeholder="เช่น example@email.com">
                         </div>
 
-                        <!-- ที่อยู่ -->
                         <div class="mb-3">
                             <label class="form-label">บ้านเลขที่ / หมู่</label>
                             <input type="text" id="address_detail" class="form-control" placeholder="เช่น 123/45 หมู่ 6">
                         </div>
 
-                        <!-- จังหวัด / อำเภอ / ตำบล -->
                         <div class="row g-3">
 
                             <div class="col-md-3">
@@ -99,7 +93,6 @@
 
                         </div>
 
-                        <!-- ปุ่ม -->
                         <div class="mt-4 d-flex justify-content-end">
                             <button type="button" class="btn btn-success" id="saveCustomer">
                                 บันทึกลูกค้า
@@ -197,9 +190,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // ======================
-            // 🧮 คำนวณใบเสนอราคา
-            // ======================
             let index = 1;
 
             const subTotalEl = document.getElementById('subTotal');
@@ -272,17 +262,11 @@
             document.querySelectorAll('#itemsTable tbody tr').forEach(row => calcRow(row));
             calculateSummary();
 
-            // ======================
-            // 👤 เปิด/ปิดฟอร์มลูกค้า
-            // ======================
             document.getElementById('toggleCustomerForm').onclick = function() {
                 const form = document.getElementById('customerForm');
                 form.style.display = (form.style.display === 'none') ? 'block' : 'none';
             };
 
-            // ======================
-            // 🌍 จังหวัด อำเภอ ตำบล
-            // ======================
             const apiURL =
                 'https://raw.githubusercontent.com/kongvut/thai-province-data/master/api/latest/province_with_district_and_sub_district.json';
 
@@ -352,9 +336,6 @@
                 zipcode.value = this.selectedOptions[0]?.dataset?.zip || '';
             });
 
-            // ======================
-            // 💾 บันทึกลูกค้า
-            // ======================
             document.getElementById('saveCustomer').onclick = function() {
 
                 const data = {

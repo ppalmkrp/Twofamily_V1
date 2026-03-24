@@ -9,7 +9,7 @@
 @section('content')
 <div class="container py-3">
 
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert alert-success shadow-sm">
             {{ session('success') }}
         </div>
@@ -19,10 +19,11 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>เลขที่ใบแจ้งหนี้</th>
+                    <th>เลขที่</th>
                     <th>ลูกค้า</th>
-                    <th>อ้างอิงใบเสนอราคา</th>
-                    <th class="text-end">ยอดรวม</th>
+                    <th>อ้างอิง</th>
+                    <th class="text-end">ยอดหลังหักส่วนลด (ไม่รวม VAT)</th>
+                    <th class="text-end">ยอดสุทธิ (รวม VAT)</th>
                     <th class="text-center">สถานะ</th>
                     <th class="text-center">จัดการ</th>
                 </tr>
@@ -30,6 +31,18 @@
 
             <tbody>
                 @forelse ($invoices as $inv)
+
+                @php
+                    $subTotal = $inv->quotation->subtotal ?? 0;
+                    $discount = $inv->quotation->discount ?? 0;
+
+                    $afterDiscount = max($subTotal - $discount, 0);
+
+                    $vat = $afterDiscount * 0.07;
+
+                    $grandTotal = $afterDiscount + $vat;
+                @endphp
+
                 <tr>
 
                     <td>
@@ -47,11 +60,15 @@
                     </td>
 
                     <td class="text-end">
-                        {{ number_format($inv->total, 2) }}
+                        {{ number_format($afterDiscount, 2) }}
+                    </td>
+
+                    <td class="text-end">
+                        {{ number_format($grandTotal, 2) }}
                     </td>
 
                     <td class="text-center">
-                        @if($inv->status == 'paid')
+                        @if ($inv->status == 'paid')
                             <span class="badge bg-success">ชำระแล้ว</span>
                         @else
                             <span class="badge bg-warning text-dark">ยังไม่ชำระ</span>
@@ -61,13 +78,11 @@
                     <td class="text-center">
                         <div class="btn-group">
 
-                            <!-- ดู -->
                             <a href="{{ route('invoices.show', $inv->id_invoice) }}"
                                class="btn btn-sm btn-outline-primary">
                                 ดู
                             </a>
 
-                            <!-- ลบ -->
                             <form action="{{ route('invoices.destroy', $inv->id_invoice) }}"
                                   method="POST"
                                   onsubmit="return confirm('ยืนยันลบใบแจ้งหนี้?')">
@@ -82,9 +97,10 @@
                     </td>
 
                 </tr>
+
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
+                    <td colspan="7" class="text-center text-muted py-4">
                         — ยังไม่มีใบแจ้งหนี้ —
                     </td>
                 </tr>

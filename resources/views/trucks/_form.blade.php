@@ -8,7 +8,7 @@
             class="form-control form-control-lg @error('id_truck') is-invalid @enderror" placeholder="เช่น 70-1234"
             required pattern="[0-9\s\-]+" title="ใช้ได้เฉพาะ ตัวเลข และเครื่องหมายขีดกลาง (-)">
         <div class="invalid-feedback">
-            รูปแบบทะเบียนไม่ถูกต้อง (70-1234)
+            ไม่สามารถกรอกเลขทะเบียนซ้ำได้
         </div>
         @error('id_truck')
             <div class="invalid-feedback">{{ $message }}</div>
@@ -76,7 +76,7 @@
 
     <div class="col-md-6">
         <label class="form-label">น้ำหนักรถ (กก.)</label>
-        <input type="number" min="0" name="weight_truck"
+        <input type="number" min="0" max="12000" name="weight_truck"
             value="{{ old('weight_truck', $truck->weight_truck ?? '') }}"
             class="form-control form-control-lg @error('weight_truck') is-invalid @enderror" placeholder="เช่น 12000">
         @error('weight_truck')
@@ -86,7 +86,7 @@
 
     <div class="col-md-6">
         <label class="form-label">ความจุถังน้ำมัน (ลิตร)</label>
-        <input type="number" min="0" name="fuelfactory_truck"
+        <input type="number" min="0" max="600" name="fuelfactory_truck"
             value="{{ old('fuelfactory_truck', $truck->fuelfactory_truck ?? '') }}"
             class="form-control form-control-lg @error('fuelfactory_truck') is-invalid @enderror"
             placeholder="เช่น 300">
@@ -97,7 +97,7 @@
 
     <div class="col-md-6">
         <label class="form-label">อัตราการสิ้นเปลืองน้ำมัน (กม./ลิตร)</label>
-        <input type="number" name="fuel_rate" value="{{ old('fuel_rate', $truck->fuel_rate ?? '') }}"
+        <input type="number" min="5" max="8" name="fuel_rate" value="{{ old('fuel_rate', $truck->fuel_rate ?? '') }}"
             class="form-control form-control-lg @error('fuel_rate') is-invalid @enderror" placeholder="เช่น 5.5"
             step="0.01" min="0" required>
         @error('fuel_rate')

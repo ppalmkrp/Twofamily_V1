@@ -47,21 +47,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>รายละเอียดต้นทาง <small class="text-muted">(บ้านเลขที่ / ซอย / จุดสังเกต)</small></label>
-                        <textarea name="start_detail" class="form-control" rows="2" placeholder="เช่น 123/4 ซอยหน้าป้าย โรงงาน ABC">{{ old('start_detail', $fuel_record->start_detail ?? '') }}</textarea>
-                    </div>
-
-                    <div class="mb-3">
                         <label>ปลายทาง <span class="text-danger">*</span> <small
                                 class="text-muted">(ใช้คำนวณแผนที่)</small></label>
                         <input type="text" id="destination" name="destination" class="form-control"
                             placeholder="เช่น จังหวัดเลย หรือคลิกบนแผนที่"
                             value="{{ old('destination', $fuel_record->destination ?? '') }}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>รายละเอียดปลายทาง <small class="text-muted">(บ้านเลขที่ / ซอย / จุดสังเกต)</small></label>
-                        <textarea name="destination_detail" class="form-control" rows="2" placeholder="เช่น โกดังสีแดง ตรงข้ามตลาด">{{ old('destination_detail', $fuel_record->destination_detail ?? '') }}</textarea>
                     </div>
 
                     <div class="mb-3">

@@ -78,7 +78,7 @@ Route::middleware([
     Route::resource('quotations', QuotationController::class);
 
     Route::post('/quotations/{id}/cancel', [QuotationController::class, 'cancel'])
-    ->name('quotations.cancel');
+        ->name('quotations.cancel');
 
     Route::post('/quotations/{id}/approve', [QuotationController::class, 'approve'])
         ->name('quotations.approve');
@@ -110,6 +110,15 @@ Route::middleware([
     Route::post('/receipts/create/{id}', [ReceiptController::class, 'createFromInvoice'])
         ->name('receipts.createFromInvoice');
 
+    Route::get('/receipts/{id}', [ReceiptController::class, 'show'])
+        ->name('receipts.show');
+
+    Route::get('/receipts', [ReceiptController::class, 'index'])->name('receipts.index');
+    Route::get('/receipts/pdf/{id}', [ReceiptController::class, 'pdf'])->name('receipts.pdf');
+
+    Route::delete('/receipts/{id}', [ReceiptController::class, 'destroy'])
+        ->name('receipts.destroy');
+
     /*
     |--------------------------------------------------------------------------
     | Settings
@@ -123,6 +132,27 @@ Route::middleware([
 
     Route::post('/settings/documents/quotation', [SettingController::class, 'quotationUpdate'])
         ->name('settings.quotation.update');
+
+    Route::get('/settings/documents/invoice', [SettingController::class, 'invoice'])
+        ->name('settings.invoice');
+
+    Route::post('/settings/documents/invoice', [SettingController::class, 'invoiceUpdate'])
+        ->name('settings.invoice.update');
+
+    Route::get('/settings/documents/invoice', [SettingController::class, 'invoice'])
+        ->name('settings.invoice');
+
+    Route::get(
+        '/settings/documents/receipt',
+        fn() => view('settings.documents.receipt', [
+            'settings' => \App\Models\Setting::pluck('value', 'key')
+        ])
+    )->name('settings.documents.receipt');
+    Route::post('/settings/update', [App\Http\Controllers\SettingController::class, 'update'])
+        ->name('settings.update');
+
+    Route::post('/settings/receipt', [App\Http\Controllers\SettingController::class, 'update'])
+        ->name('settings.receipt.update');
 
     /*
     |--------------------------------------------------------------------------

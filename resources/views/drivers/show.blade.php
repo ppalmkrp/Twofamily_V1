@@ -26,46 +26,53 @@
         }
     </style>
 
-    <div class="container py-4">
-        <div class="card detail-card">
-            <div class="card-body p-4 p-lg-5">
+    <div class="card detail-card">
 
-                <div class="mb-3">
-                    <div class="label">ชื่อ-สกุล</div>
-                    <div class="value">{{ $driver->name_driver }}</div>
+        @if ($driver->citizen_image)
+            <div class="text-center mt-4">
+                <img src="{{ asset('storage/' . $driver->citizen_image) }}" class="img-fluid rounded shadow"
+                    style="max-width: 300px;">
+            </div>
+        @endif
+
+        <div class="card-body p-4 p-lg-5">
+
+            <div class="mb-3">
+                <div class="label">ชื่อ-สกุล</div>
+                <div class="value">
+                    {{ $driver->fname_driver }} {{ $driver->lname_driver }}
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <div class="label">เบอร์โทร</div>
-                    <div class="value">{{ $driver->phone_driver ?: '-' }}</div>
+            <div class="mb-3">
+                <div class="label">เบอร์โทร</div>
+                <div class="value">{{ $driver->phone_driver ?: '-' }}</div>
+            </div>
+
+            <div class="mb-3">
+                <div class="label">เลขบัตรประชาชน</div>
+                <div class="value">{{ $driver->citizenid_driver ?: '-' }}</div>
+            </div>
+
+            <div class="mb-3">
+                <div class="label">ที่อยู่</div>
+                <div class="value">
+                    {{ $driver->address_detail }}
+                    {{ $driver->subdistrict }}
+                    {{ $driver->district }}
+                    {{ $driver->province }}
+                    {{ $driver->zipcode }}
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <div class="label">เลขบัตรประชาชน</div>
-                    <div class="value">{{ $driver->citizenid_driver ?: '-' }}</div>
-                </div>
+            <div class="pt-3 d-flex gap-2">
+                <a href="{{ route('drivers.index') }}" class="btn btn-outline-secondary">
+                    ย้อนกลับ
+                </a>
 
-                <div class="mb-3">
-                    <div class="label">ที่อยู่</div>
-                    <div class="value">
-                        {{ $driver->address_detail }}
-                        {{ $driver->subdistrict }}
-                        {{ $driver->district }}
-                        {{ $driver->province }}
-                        {{ $driver->zipcode }}
-                    </div>
-                </div>
-
-                <div class="pt-3 d-flex gap-2">
-                    <a href="{{ route('drivers.index') }}" class="btn btn-outline-secondary">
-                        ย้อนกลับ
-                    </a>
-
-                    <a href="{{ route('drivers.edit', $driver) }}" class="btn btn-outline-primary">
-                        แก้ไข
-                    </a>
-                </div>
-
+                <a href="{{ route('drivers.edit', $driver) }}" class="btn btn-outline-primary">
+                    แก้ไข
+                </a>
             </div>
         </div>
     </div>

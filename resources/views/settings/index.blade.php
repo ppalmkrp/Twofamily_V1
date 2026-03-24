@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('namepage')
-⚙️ ตั้งค่า
+ตั้งค่า
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
         <a href="{{ route('settings.documents') }}" class="text-decoration-none">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body text-center">
-                    <h5>📄 ตั้งค่าเอกสาร</h5>
+                    <h5>ตั้งค่าเอกสาร</h5>
                 </div>
             </div>
         </a>
