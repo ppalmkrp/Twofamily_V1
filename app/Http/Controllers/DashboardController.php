@@ -22,7 +22,6 @@ class DashboardController extends Controller
             ->select('id_truck', 'truck_brand_id', 'truck_model_id', 'status_truck')
             ->limit(5)->get();
 
-        //  แก้ไขตรงนี้: เปลี่ยนมาดึง fname_driver และ lname_driver แทน
         $latestDrivers = Driver::select('id_driver', 'fname_driver', 'lname_driver', 'phone_driver')
             ->orderByDesc('id_driver')->limit(5)->get();
 

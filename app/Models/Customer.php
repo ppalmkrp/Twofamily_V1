@@ -23,5 +23,9 @@ class Customer extends Model
         'province',
         'zipcode',
     ];
-    
+
+    public function camps()
+{
+    return $this->hasMany(Camp::class, 'id_customer', 'id_customer');
+}
 }

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\FuelRecord;
 use App\Models\Truck;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Models\Camp;
 
 class FuelRecordController extends Controller
 {
@@ -21,13 +23,23 @@ class FuelRecordController extends Controller
             ->latest()
             ->paginate(10);
 
-        $trucks = Truck::where('status_truck', 'active')->get();
+        $trucks = Truck::orderBy('id_truck')->get();
 
         return view('fuel_records.index', compact('records', 'trucks', 'q', 'trucks_id'));
     }
+
     public function create()
     {
-        $trucks = Truck::where('status_truck', 'active')->get();
+        $trucks = Truck::available()->orderBy('id_truck')->get();
+
+        // เฉพาะแคมป์ที่กรอกพิกัดไว้แล้ว
+        $camps = Camp::active()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->with('customer')
+            ->orderBy('name_camp')
+            ->get();
+
         $dieselPrice = '';
 
         try {
@@ -40,7 +52,6 @@ class FuelRecordController extends Controller
 
                     $diesel = collect($oilList)->firstWhere('OilName', 'ไฮดีเซล S');
                     if ($diesel) {
-                        //  แก้ไขตรงนี้ให้ดึง PriceToday ก่อน ถ้าไม่มีค่อยเอา PriceTomorrow
                         $dieselPrice = $diesel['PriceToday'] ?? $diesel['PriceTomorrow'];
                     }
                 }
@@ -48,51 +59,78 @@ class FuelRecordController extends Controller
         } catch (\Exception $e) {
         }
 
-        return view('fuel_records.create', compact('trucks', 'dieselPrice'));
+        return view('fuel_records.create', compact('trucks', 'camps', 'dieselPrice'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'date_record' => 'required|date',
-            'start_point' => 'required',
-            'destination' => 'required',
-            'trucks_id_truck' => 'required|exists:trucks,id_truck',
-            'distance' => 'nullable|numeric',
-            'cost_fuel' => 'nullable|numeric',
-            'cost_fuel_total' => 'nullable|numeric'
+        $data = $request->validate([
+            'date_record'     => 'required|date',
+            'start_point'     => 'required',
+            'destination'     => 'required',
+            'trucks_id_truck' => [
+                'required',
+                Rule::exists('trucks', 'id_truck')->where('status_truck', 'active'),
+            ],
+            'distance'        => 'nullable|numeric',
+            'cost_fuel'       => 'nullable|numeric',
+            'cost_fuel_total' => 'nullable|numeric',
+        ], [
+            'trucks_id_truck.exists' => 'รถคันนี้ไม่พร้อมใช้งาน (อยู่ระหว่างซ่อมบำรุงหรือปลดประจำการแล้ว)',
         ]);
 
         FuelRecord::create([
-            'date_record' => $request->date_record,
-            'start_point' => $request->start_point,
-            'destination' => $request->destination,
-            'trucks_id_truck' => $request->trucks_id_truck,
-            'distance' => $request->distance ?: null,
-            'cost_fuel' => $request->cost_fuel ?: null,
-            'cost_fuel_total' => $request->cost_fuel_total ?: null,
+            'date_record'     => $data['date_record'],
+            'start_point'     => $data['start_point'],
+            'destination'     => $data['destination'],
+            'trucks_id_truck' => $data['trucks_id_truck'],
+            'distance'        => $data['distance'] ?: null,
+            'cost_fuel'       => $data['cost_fuel'] ?: null,
+            'cost_fuel_total' => $data['cost_fuel_total'] ?: null,
         ]);
 
         return redirect()->route('fuel_records.index')->with('ok', 'บันทึกข้อมูลเรียบร้อย');
     }
 
-
     public function edit(FuelRecord $fuel_record)
     {
-        $trucks = Truck::where('status_truck', 'active')->get();
-        return view('fuel_records.create', compact('fuel_record', 'trucks'));
+        $trucks = Truck::available()
+            ->orWhere('id_truck', $fuel_record->trucks_id_truck)
+            ->orderBy('id_truck')
+            ->get();
+
+        $camps = Camp::active()
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->with('customer')
+            ->orderBy('name_camp')
+            ->get();
+
+        return view('fuel_records.create', compact('fuel_record', 'trucks', 'camps'));
     }
 
     public function update(Request $request, FuelRecord $fuel_record)
     {
-        $request->validate([
-            'date_record' => 'required|date',
-            'start_point' => 'required',
-            'destination' => 'required',
-            'trucks_id_truck' => 'required|exists:trucks,id_truck',
+        $data = $request->validate([
+            'date_record'     => 'required|date',
+            'start_point'     => 'required',
+            'destination'     => 'required',
+            'trucks_id_truck' => [
+                'required',
+                Rule::exists('trucks', 'id_truck')->where(
+                    fn($query) => $query->where('status_truck', 'active')
+                        ->orWhere('id_truck', $fuel_record->trucks_id_truck)
+                ),
+            ],
+            'distance'        => 'nullable|numeric',
+            'cost_fuel'       => 'nullable|numeric',
+            'cost_fuel_total' => 'nullable|numeric',
+        ], [
+            'trucks_id_truck.exists' => 'รถคันนี้ไม่พร้อมใช้งาน (อยู่ระหว่างซ่อมบำรุงหรือปลดประจำการแล้ว)',
         ]);
 
-        $fuel_record->update($request->all());
+        $fuel_record->update($data);
+
         return redirect()->route('fuel_records.index')->with('ok', 'แก้ไขข้อมูลเรียบร้อย');
     }
 

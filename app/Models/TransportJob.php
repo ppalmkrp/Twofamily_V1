@@ -18,7 +18,6 @@ class TransportJob extends Model
         'customer_id',
     ];
 
-    // ✅ ลูกค้า (รวม soft delete)
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'id_customer')

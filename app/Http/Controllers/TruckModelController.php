@@ -10,14 +10,12 @@ class TruckModelController extends Controller
 {
     public function index()
     {
-        // ดึงข้อมูลรุ่น พร้อมกับชื่อยี่ห้อ (Relationship)
         $models = TruckModel::with('brand')->latest()->paginate(10);
         return view('truck_models.index', compact('models'));
     }
 
     public function create()
     {
-        // ต้องส่งข้อมูลยี่ห้อไปให้หน้าเว็บทำ Dropdown ด้วย
         $brands = TruckBrand::orderBy('name_brand')->get();
         return view('truck_models.create', compact('brands'));
     }

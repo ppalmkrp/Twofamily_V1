@@ -27,7 +27,6 @@ class FuelRecord extends Model
         'cost_fuel_total'
     ];
 
-    // ความสัมพันธ์กับ Truck
     public function truck()
     {
         return $this->belongsTo(Truck::class, 'trucks_id_truck', 'id_truck');

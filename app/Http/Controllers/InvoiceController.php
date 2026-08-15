@@ -73,4 +73,19 @@ class InvoiceController extends Controller
 
         return $pdf->stream('INV-' . $invoice->id_invoice . '.pdf');
     }
+
+    public function destroy($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+
+        // ลบรายละเอียดใบแจ้งหนี้ก่อน
+        InvoiceDetail::where('id_invoice', $invoice->id_invoice)->delete();
+
+        // ลบใบแจ้งหนี้
+        $invoice->delete();
+
+        return redirect()
+            ->route('invoices.index')
+            ->with('success', 'ลบใบแจ้งหนี้เรียบร้อยแล้ว');
+    }
 }

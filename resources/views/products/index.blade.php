@@ -24,6 +24,7 @@
                 </button>
             </form>
 
+            
             <a href="{{ route('products.create') }}" class="btn btn-dark">
                 + เพิ่มสินค้า
             </a>

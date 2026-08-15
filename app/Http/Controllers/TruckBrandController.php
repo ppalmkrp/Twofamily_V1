@@ -9,7 +9,6 @@ class TruckBrandController extends Controller
 {
     public function index()
     {
-        // ดึงข้อมูลยี่ห้อทั้งหมด เรียงจากใหม่ไปเก่า
         $brands = TruckBrand::latest()->paginate(10);
         return view('truck_brands.index', compact('brands'));
     }
@@ -36,7 +35,6 @@ class TruckBrandController extends Controller
     public function edit($id)
     {
         $truck_brand = TruckBrand::findOrFail($id);
-        // ใช้หน้า create.blade.php ร่วมกันสำหรับฟอร์มแก้ไข
         return view('truck_brands.create', compact('truck_brand'));
     }
 

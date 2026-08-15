@@ -20,8 +20,8 @@ class ProductType extends Model
     {
         return $this->hasMany(
             Product::class,
-            'product_type_id',   // FK ใน products
-            'id_product_type'    // PK ใน product_types
+            'product_type_id',
+            'id_product_type' 
         );
     }
 }

@@ -14,13 +14,11 @@ class InvoiceDetail extends Model
         'total'
     ];
 
-    // 🔗 สินค้า
     public function product()
     {
         return $this->belongsTo(Product::class, 'id_product');
     }
 
-    // 🔗 invoice
     public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'id_invoice');

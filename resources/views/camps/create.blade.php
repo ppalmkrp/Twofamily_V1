@@ -2,7 +2,7 @@
 
 @section('namepage')
     <div class="container">
-        <h3>เพิ่มรถบรรทุก</h3>
+        <h3>เพิ่มแคมป์งาน</h3>
     </div>
 @endsection
 
@@ -19,18 +19,16 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('trucks.store') }}" autocomplete="off">
+        <form method="POST" action="{{ route('camps.store') }}" autocomplete="off">
             @csrf
 
-            @include('trucks._form', [
-                'truck' => $truck,
-                'mode' => 'create',
-                'brands' => $brands,
-                'provinces' => config('provinces'),
+            @include('camps._form', [
+                'camp' => $camp,
+                'customers' => $customers,
             ])
 
             <button class="btn btn-dark">บันทึก</button>
-            <a href="{{ route('trucks.index') }}" class="btn btn-outline-secondary">ย้อนกลับ</a>
+            <a href="{{ route('camps.index') }}" class="btn btn-outline-secondary">ย้อนกลับ</a>
 
         </form>
     </div>

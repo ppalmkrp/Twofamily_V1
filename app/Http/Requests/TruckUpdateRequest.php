@@ -15,7 +15,7 @@ class TruckUpdateRequest extends FormRequest
     public function rules(): array
     {
         $yearMax = (int) now()->year;
-        $current = $this->route('truck'); // จะได้ค่าเป็น id_truck
+        $current = $this->route('truck');
 
         return [
             'id_truck' => [
@@ -28,7 +28,7 @@ class TruckUpdateRequest extends FormRequest
                     ->ignore($current, 'id_truck')
                     ->whereNull('deleted_at'),
             ],
-            'truck_brand_id'    => 'required|exists:truck_brands,id',  //  เปลี่ยนเป็นชื่อนี้
+            'truck_brand_id'    => 'required|exists:truck_brands,id', 
             'truck_model_id'    => 'required|exists:truck_models,id',
             'year_truck'        => ['nullable', 'integer', "between:1980,$yearMax"],
             'weight_truck'      => ['nullable', 'integer', 'min:0'],

@@ -48,7 +48,6 @@ class ProductController extends Controller
             'new_type'       => 'nullable|string|max:255',
         ]);
 
-        // ถ้ามีการเพิ่มประเภทใหม่
         if ($request->filled('new_type')) {
             $newType = ProductType::create([
                 'name_product_type' => $request->new_type,

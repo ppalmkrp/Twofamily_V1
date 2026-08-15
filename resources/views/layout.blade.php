@@ -169,6 +169,13 @@
                         </li>
 
                         <li class="nav-item">
+                            <a href="{{ route('camps.index') }}"
+                                class="nav-link {{ request()->routeIs('camps.*') ? 'active' : '' }}">
+                                <span>แคมป์งาน</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('products.*') || request()->routeIs('product_types.*') ? 'active' : '' }}"
                                 data-bs-toggle="collapse" href="#productMenu" role="button"
                                 aria-expanded="{{ request()->routeIs('products.*') || request()->routeIs('product_types.*') ? 'true' : 'false' }}"

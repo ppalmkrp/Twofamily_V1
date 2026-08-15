@@ -15,7 +15,8 @@ use App\Http\Controllers\{
     TruckBrandController,
     TruckModelController,
     SettingController,
-    ReceiptController
+    ReceiptController,
+    CampController
 };
 
 /*
@@ -61,6 +62,21 @@ Route::middleware([
     Route::resource('truck_brands', TruckBrandController::class);
     Route::resource('truck_models', TruckModelController::class);
     Route::resource('trucks', TruckController::class)->except(['show']);
+    /*
+    |--------------------------------------------------------------------------
+    | Truck Status & Maintenance
+    |--------------------------------------------------------------------------
+    */
+    Route::get('trucks/{truck}/detail', [TruckController::class, 'show'])
+        ->name('trucks.show');
+
+    Route::patch('trucks/{truck}/status', [TruckController::class, 'updateStatus'])
+        ->name('trucks.status');
+
+    Route::patch('maintenances/{maintenance}/finish', [TruckController::class, 'finishMaintenance'])
+        ->name('maintenances.finish');
+
+    Route::resource('trucks', TruckController::class)->except(['show']);   // <- บรรทัดเดิม อยู่ต่อจากนี้
 
     /*
     |--------------------------------------------------------------------------
@@ -161,4 +177,14 @@ Route::middleware([
     */
     Route::post('/customers/ajax', [CustomerController::class, 'storeAjax'])
         ->name('customers.store.ajax');
+
+    Route::resource('camps', CampController::class)->except(['show']);
+
+    Route::post('camps/{camp}/trucks', [CampController::class, 'assignTruck'])
+    ->name('camps.trucks.assign');
+
+Route::patch('camps/{camp}/trucks/{assignment}/release', [CampController::class, 'releaseTruck'])
+    ->name('camps.trucks.release');
+
+Route::resource('camps', CampController::class);   // เอา ->except(['show']) ออก
 });

@@ -1,45 +1,43 @@
 @php($mode = $mode ?? 'create')
 @php($ymax = now()->year)
 
-<div class="row g-3">
-    <div class="col-md-6">
-        <label class="form-label">เลขทะเบียน</label>
-        <input type="text" name="id_truck" id="id_truck" value="{{ old('id_truck', $truck->id_truck ?? '') }}"
-            class="form-control form-control-lg @error('id_truck') is-invalid @enderror" placeholder="เช่น 70-1234"
-            required pattern="[0-9\s\-]+" title="ใช้ได้เฉพาะ ตัวเลข และเครื่องหมายขีดกลาง (-)">
-        <div class="invalid-feedback">
-            ไม่สามารถกรอกเลขทะเบียนซ้ำได้
-        </div>
-        @error('id_truck')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+<div class="mb-3">
+    <label class="form-label">เลขทะเบียน</label>
+    <input type="text" name="id_truck" id="id_truck" value="{{ old('id_truck', $truck->id_truck ?? '') }}"
+        class="form-control @error('id_truck') is-invalid @enderror"
+        placeholder="เช่น 70-1234" required maxlength="7" inputmode="numeric">
+    @error('id_truck')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+    <div class="form-text text-muted">ตัวเลข 2 หลัก + ตัวเลข 4 หลัก ระบบใส่ขีดกลางให้อัตโนมัติ</div>
+</div>
 
-    <div class="col-md-6">
-        <label class="form-label">จังหวัด</label>
-        <select name="province_truck" class="form-select form-select-lg @error('province_truck') is-invalid @enderror"
-            required>
-            <option value="">— เลือกจังหวัด —</option>
-            @foreach ($provinces as $province)
-                <option value="{{ $province }}"
-                    {{ old('province_truck', $truck->province_truck ?? '') == $province ? 'selected' : '' }}>
-                    {{ $province }}
-                </option>
-            @endforeach
-        </select>
-        @error('province_truck')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+<div class="mb-3">
+    <label class="form-label">จังหวัดที่จดทะเบียน</label>
+    <select name="province_truck" class="form-select @error('province_truck') is-invalid @enderror" required>
+        <option value="">— เลือกจังหวัด —</option>
+        @foreach ($provinces as $province)
+            <option value="{{ $province }}" @selected(old('province_truck', $truck->province_truck ?? '') == $province)>
+                {{ $province }}
+            </option>
+        @endforeach
+    </select>
+    @error('province_truck')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
 
-    <div class="col-md-6">
-        <label class="form-label">ยี่ห้อ <span class="text-danger">*</span></label>
+<div class="row g-3 mt-2">
+
+    <div class="col-md-4">
+        <label>ยี่ห้อ</label>
         <select name="truck_brand_id" id="truck_brand_select"
-            class="form-select form-select-lg @error('truck_brand_id') is-invalid @enderror" required>
+            class="form-select @error('truck_brand_id') is-invalid @enderror" required>
             <option value="">— เลือกยี่ห้อรถ —</option>
             @if (isset($brands))
                 @foreach ($brands as $brand)
-                    <option value="{{ $brand->id }}" @selected(old('truck_brand_id', $truck->truck_brand_id ?? '') == $brand->id)>
+                    <option value="{{ $brand->id }}"
+                        @selected(old('truck_brand_id', $truck->truck_brand_id ?? '') == $brand->id)>
                         {{ $brand->name_brand }}
                     </option>
                 @endforeach
@@ -50,23 +48,26 @@
         @enderror
     </div>
 
-    <div class="col-md-6">
-        <label class="form-label">รุ่น <span class="text-danger">*</span></label>
+    <div class="col-md-4">
+        <label>รุ่น</label>
         <select name="truck_model_id" id="truck_model_select"
-            class="form-select form-select-lg @error('truck_model_id') is-invalid @enderror" required disabled>
+            class="form-select @error('truck_model_id') is-invalid @enderror" required disabled>
             <option value="">— เลือกรุ่นรถ —</option>
         </select>
         @error('truck_model_id')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
+        <div class="form-text text-muted">เลือกยี่ห้อก่อน</div>
     </div>
 
-    <div class="col-md-6">
-        <label class="form-label">ปีที่ซื้อ</label>
-        <select name="year_truck" class="form-select form-select-lg @error('year_truck') is-invalid @enderror">
+    <div class="col-md-4">
+        <label>ปีที่ซื้อ</label>
+        <select name="year_truck" class="form-select @error('year_truck') is-invalid @enderror">
             <option value="">— เลือกปี —</option>
             @for ($y = $ymax; $y >= 1980; $y--)
-                <option value="{{ $y }}" @selected(old('year_truck', $truck->year_truck ?? '') == $y)>{{ $y }}</option>
+                <option value="{{ $y }}" @selected(old('year_truck', $truck->year_truck ?? '') == $y)>
+                    {{ $y }}
+                </option>
             @endfor
         </select>
         @error('year_truck')
@@ -74,133 +75,203 @@
         @enderror
     </div>
 
-    <div class="col-md-6">
-        <label class="form-label">น้ำหนักรถ (กก.)</label>
-        <input type="number" min="0" max="12000" name="weight_truck"
+</div>
+
+<div class="row g-3 mt-2">
+
+    <div class="col-md-4">
+        <label>น้ำหนักรถ (กก.)</label>
+        <input type="number" name="weight_truck" min="0" max="50000" step="1"
             value="{{ old('weight_truck', $truck->weight_truck ?? '') }}"
-            class="form-control form-control-lg @error('weight_truck') is-invalid @enderror" placeholder="เช่น 12000">
+            class="form-control @error('weight_truck') is-invalid @enderror" placeholder="เช่น 12000">
         @error('weight_truck')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
-    <div class="col-md-6">
-        <label class="form-label">ความจุถังน้ำมัน (ลิตร)</label>
-        <input type="number" min="0" max="600" name="fuelfactory_truck"
+    <div class="col-md-4">
+        <label>ความจุถังน้ำมัน (ลิตร)</label>
+        <input type="number" name="fuelfactory_truck" min="0" max="1000" step="1"
             value="{{ old('fuelfactory_truck', $truck->fuelfactory_truck ?? '') }}"
-            class="form-control form-control-lg @error('fuelfactory_truck') is-invalid @enderror"
-            placeholder="เช่น 300">
+            class="form-control @error('fuelfactory_truck') is-invalid @enderror" placeholder="เช่น 300">
         @error('fuelfactory_truck')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
 
-    <div class="col-md-6">
-        <label class="form-label">อัตราการสิ้นเปลืองน้ำมัน (กม./ลิตร)</label>
-        <input type="number" min="5" max="8" name="fuel_rate" value="{{ old('fuel_rate', $truck->fuel_rate ?? '') }}"
-            class="form-control form-control-lg @error('fuel_rate') is-invalid @enderror" placeholder="เช่น 5.5"
-            step="0.01" min="0" required>
+    <div class="col-md-4">
+        <label>อัตราสิ้นเปลือง (กม./ลิตร)</label>
+        <input type="number" name="fuel_rate" min="0.1" max="50" step="0.01" required
+            value="{{ old('fuel_rate', $truck->fuel_rate ?? '') }}"
+            class="form-control @error('fuel_rate') is-invalid @enderror" placeholder="เช่น 5.5">
         @error('fuel_rate')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
+        <div class="form-text text-muted">ใช้คำนวณต้นทุนน้ำมันของแต่ละงาน</div>
     </div>
 
-    <div class="col-md-6">
-        <label class="form-label">สถานะ</label>
-        <select name="status_truck" class="form-select form-select-lg @error('status_truck') is-invalid @enderror"
-            required>
-            @php($val = old('status_truck', $truck->status_truck ?? 'active'))
-            <option value="active" @selected($val === 'active')>พร้อมใช้งาน</option>
-            <option value="maintenance" @selected($val === 'maintenance')>ซ่อมบำรุง</option>
-            <option value="retired" @selected($val === 'retired')>ปลดประจำการ</option>
-        </select>
-        @error('status_truck')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
 </div>
 
+<div class="mb-3 mt-4">
+    <label class="form-label">สถานะ</label>
+    @php($val = old('status_truck', $truck->status_truck ?? 'active'))
+    <select name="status_truck" id="status_truck"
+        class="form-select @error('status_truck') is-invalid @enderror" required>
+        @foreach (\App\Models\Truck::STATUS_LABELS as $value => $label)
+            <option value="{{ $value }}" @selected($val === $value)>{{ $label }}</option>
+        @endforeach
+    </select>
+    @error('status_truck')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+
+    @if ($mode !== 'create')
+        <div class="form-text text-muted">
+            เปลี่ยนสถานะพร้อมบันทึกประวัติการซ่อมได้ที่หน้ารายละเอียดรถ
+        </div>
+    @endif
+</div>
+
+@if ($mode === 'create')
+    <div id="maintenanceBox" class="card border-warning mb-4 d-none">
+        <div class="card-body">
+            <h6 class="mb-3">บันทึกการซ่อมของรถคันนี้</h6>
+
+            <div class="mb-3">
+                <label class="form-label">ซ่อมอะไร</label>
+                <input type="text" name="title" value="{{ old('title') }}"
+                    class="form-control @error('title') is-invalid @enderror"
+                    placeholder="เช่น เปลี่ยนยาง 6 เส้น">
+                @error('title')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">รายละเอียดเพิ่มเติม</label>
+                <textarea name="detail" rows="2"
+                    class="form-control @error('detail') is-invalid @enderror">{{ old('detail') }}</textarea>
+                @error('detail')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <label>วันที่เริ่มซ่อม</label>
+                    <input type="date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}"
+                        class="form-control @error('start_date') is-invalid @enderror">
+                    @error('start_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>คาดว่าเสร็จ</label>
+                    <input type="date" name="expected_return" value="{{ old('expected_return') }}"
+                        class="form-control @error('expected_return') is-invalid @enderror">
+                    @error('expected_return')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>อู่ / ผู้ซ่อม</label>
+                    <input type="text" name="garage" value="{{ old('garage') }}"
+                        class="form-control @error('garage') is-invalid @enderror">
+                    @error('garage')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-3">
+                    <label>ค่าซ่อมโดยประมาณ (บาท)</label>
+                    <input type="number" step="0.01" min="0" name="cost" value="{{ old('cost') }}"
+                        class="form-control @error('cost') is-invalid @enderror">
+                    @error('cost')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+            </div>
+        </div>
+    </div>
+@endif
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. ระบบจัดการทะเบียนรถ ---
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // จัดรูปแบบเลขทะเบียน 70-1234
         const input = document.getElementById('id_truck');
 
-        // ล้างค่าให้เหลือเฉพาะ ก-ฮ และ 0-9
-        const clean = (v) => v.replace(/[^ก-ฮ0-9]/gu, '');
+        if (input) {
+            const MAX_FRONT = 2;
+            const MAX_BACK = 4;
+            const MAX_TOTAL = MAX_FRONT + MAX_BACK;
 
-        const format = (v) => {
-            if (v.length <= 2) return v;
-            return v.slice(0, 2) + '-' + v.slice(2);
-        };
+            const clean = (v) => v.replace(/\D/g, '').slice(0, MAX_TOTAL);
 
-        input.addEventListener('input', () => {
-            let raw = clean(input.value);
+            input.addEventListener('input', function() {
+                const raw = clean(input.value);
 
-            // แยกหน้า / หลัง
-            let front = raw.slice(0, 2);
-            let back = raw.slice(2);
+                input.value = raw.length <= MAX_FRONT ?
+                    raw :
+                    raw.slice(0, MAX_FRONT) + '-' + raw.slice(MAX_FRONT);
 
-            //  บังคับ 4 ตัวหลังเป็นตัวเลขเท่านั้น
-            back = back.replace(/\D/g, '');
+                input.setCustomValidity(
+                    raw.length === MAX_TOTAL ? '' : 'กรุณากรอกเลขทะเบียนให้ครบ เช่น 70-1234'
+                );
+            });
+        }
 
-            // จำกัดจำนวน
-            front = front.slice(0, 2);
-            back = back.slice(0, 4);
-
-            input.value = format(front + back);
-        });
-
-        // --- 2. ระบบ Dependent Dropdown (ยี่ห้อ -> รุ่น) ---
+        // ยี่ห้อ → รุ่น
         @if (isset($brands))
             const brandsData = @json($brands);
             const brandSelect = document.getElementById('truck_brand_select');
             const modelSelect = document.getElementById('truck_model_select');
 
-            // ดึงค่าเก่าออกมา (ใช้ตอน validation ไม่ผ่าน หรือตอนกดแก้ไข)
             const oldModelId = "{{ old('truck_model_id', $truck->truck_model_id ?? '') }}";
 
             function updateModels() {
-                const selectedBrandId = brandSelect.value;
+                const brandId = brandSelect.value;
 
-                // ล้างข้อมูลรุ่นเก่า
                 modelSelect.innerHTML = '<option value="">— เลือกรุ่นรถ —</option>';
 
-                //  ถ้าไม่ได้เลือกยี่ห้อ (หรือกดกลับไปที่ "เลือกยี่ห้อรถ") ให้ล็อคช่องรุ่นไว้เหมือนเดิม
-                if (!selectedBrandId) {
+                if (!brandId) {
                     modelSelect.disabled = true;
                     return;
                 }
 
-                //  ถ้ามีการเลือกยี่ห้อแล้ว ให้ปลดล็อคช่องรุ่น
                 modelSelect.disabled = false;
 
-                // หายี่ห้อที่ตรงกับที่เลือก
-                const selectedBrand = brandsData.find(b => b.id == selectedBrandId);
+                const brand = brandsData.find(b => b.id == brandId);
 
-                // ถ้ายี่ห้อนี้มีรุ่น ให้สร้างตัวเลือก
-                if (selectedBrand && selectedBrand.models) {
-                    selectedBrand.models.forEach(model => {
-                        const option = document.createElement('option');
-                        option.value = model.id;
-                        option.textContent = model.name_model;
-
-                        // ถ้ารุ่นตรงกับค่าเก่าที่เคยเลือกไว้ ให้ selected ทันที
-                        if (model.id == oldModelId) {
-                            option.selected = true;
-                        }
-
-                        modelSelect.appendChild(option);
+                if (brand && brand.models) {
+                    brand.models.forEach(model => {
+                        const opt = new Option(model.name_model, model.id);
+                        if (model.id == oldModelId) opt.selected = true;
+                        modelSelect.add(opt);
                     });
                 }
             }
 
-            // สั่งทำงานเมื่อมีการเปลี่ยนยี่ห้อ
             brandSelect.addEventListener('change', updateModels);
 
-            // สั่งทำงาน 1 ครั้งตอนเปิดหน้าเว็บ (เพื่อโหลดข้อมูลเก่ามาแสดงทันที)
-            if (brandSelect.value) {
-                updateModels();
-            }
+            if (brandSelect.value) updateModels();
         @endif
+
+        const statusSelect = document.getElementById('status_truck');
+        const maintenanceBox = document.getElementById('maintenanceBox');
+
+        if (statusSelect && maintenanceBox) {
+            const toggleMaintenance = function() {
+                maintenanceBox.classList.toggle('d-none', statusSelect.value !== 'maintenance');
+            };
+
+            statusSelect.addEventListener('change', toggleMaintenance);
+            toggleMaintenance();
+        }
+
     });
 </script>

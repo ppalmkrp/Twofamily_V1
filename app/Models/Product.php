@@ -16,15 +16,15 @@ class Product extends Model
         'name_product',
         'detail_product',
         'unit_price',
-        'product_type_id', // ✅ แก้ตรงนี้
+        'product_type_id',
     ];
 
     public function type()
     {
         return $this->belongsTo(
             ProductType::class,
-            'product_type_id',   // FK ใน products
-            'id_product_type'    // PK ใน product_types
+            'product_type_id',
+            'id_product_type'
         );
     }
 }
